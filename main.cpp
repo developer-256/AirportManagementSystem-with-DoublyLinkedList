@@ -40,6 +40,14 @@ public:
     void setPrevNode(PassengerNode *prevNode) { this->prevNode = prevNode; }
     PassengerNode *getNextNode() { return nextNode; }
     PassengerNode *getPrevNode() { return prevNode; }
+    void displayPassenger()
+    {
+        cout << "Passenger Name: " << name << endl;
+        cout << "Passenger ID: " << ID << endl;
+        cout << "Passenger Flight Code: " << flightCode << endl;
+        cout << "Passenger Contact Number: " << contactNumber << endl
+             << endl;
+    }
 };
 
 class FlightNode
@@ -93,6 +101,17 @@ public:
     void setPrevNode(FlightNode *prevNode) { this->prevNode = prevNode; }
     FlightNode *getNextNode() { return nextNode; }
     FlightNode *getPrevNode() { return prevNode; }
+    void displayFlight()
+    {
+        cout << "Flight origin: " << origin << endl;
+        cout << "Flight destination: " << destination << endl;
+        cout << "Flight departure: " << departure << endl;
+        cout << "Flight arrival: " << arrival << endl;
+        cout << "Flight flighCode: " << flighCode << endl;
+        cout << "Flight price: " << price << endl;
+        cout << "Flight totalSeats: " << totalSeats << endl
+             << endl;
+    }
 };
 
 class EmployeeNode
@@ -114,22 +133,14 @@ public:
     void setPrevNode(EmployeeNode *prevNode) { this->prevNode = prevNode; }
     EmployeeNode *getNextNode() { return nextNode; }
     EmployeeNode *getPrevNode() { return prevNode; }
+    void displayEmployee()
+    {
+        cout << "Employee Name: " << name << endl;
+        cout << "Employee ID: " << ID << endl;
+        cout << "Employee Designatione: " << designation << endl
+             << endl;
+    }
 };
-
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ( Backend class start) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// class Memory
-// {
-// public:
-//     PassengerNode PassengerHeadNode;
-
-//     void importData();
-// };
-// void Memory::importData()
-// {
-//     // ifstream file;
-//     // file.open()
-// }
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ( Backend class end) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 class AirportManagementSystem
 {
@@ -156,6 +167,7 @@ public:
     // functions for system memory
     void ImportData();
     void ArrayToDoubly(string *array);
+    void exportEntireData();
 
     // functions for employee
     void pushEmployee(string n, string id, string d);
@@ -208,7 +220,7 @@ void AirportManagementSystem::ImportData()
             {
                 StorageField += StorageTouple[j];
             }
-            else // if , occur save temp_row into 2D array
+            else
             {
                 ToupleFieldsArray[cols] = StorageField;
                 cols++;
@@ -239,6 +251,44 @@ void AirportManagementSystem::ArrayToDoubly(string *array)
         pushFlight(array[1], array[2], array[3], array[4], array[5], array[6], array[7]);
     }
 }
+
+void AirportManagementSystem::exportEntireData()
+{
+    ofstream Storage;
+    Storage.open("Storage.txt", ios::trunc); // opening file in truncate mode so that original content in replaced
+    // exporting employee data
+    if (EmployeeHeadNode != nullptr)
+    {
+        EmployeeCurrentNode = EmployeeHeadNode;
+        while (EmployeeCurrentNode != nullptr)
+        {
+            Storage << "employee," << EmployeeCurrentNode->getName() << "," << EmployeeCurrentNode->getID() << "," << EmployeeCurrentNode->getDesignation() << endl;
+            EmployeeCurrentNode = EmployeeCurrentNode->getNextNode();
+        }
+    }
+    // exporting passenger data
+    if (PassengerHeadNode != nullptr)
+    {
+        PassengerCurrentNode = PassengerHeadNode;
+        while (PassengerCurrentNode != nullptr)
+        {
+            Storage << "passenger," << PassengerCurrentNode->getname() << "," << PassengerCurrentNode->getID() << "," << PassengerCurrentNode->getflightCode() << "," << PassengerCurrentNode->getcontactNumber() << endl;
+            PassengerCurrentNode = PassengerCurrentNode->getNextNode();
+        }
+    }
+    // exporting flight data
+    if (FlightHeadNode != nullptr)
+    {
+        FlightCurrentNode = FlightHeadNode;
+        while (FlightCurrentNode != nullptr)
+        {
+            Storage << "flight," << FlightCurrentNode->getOrigin() << "," << FlightCurrentNode->getDestination() << "," << FlightCurrentNode->getDeparture() << "," << FlightCurrentNode->getArrival() << "," << FlightCurrentNode->getFlighCode() << "," << FlightCurrentNode->getTotalSeats() << "," << FlightCurrentNode->getPrice() << endl;
+            FlightCurrentNode = FlightCurrentNode->getNextNode();
+        }
+    }
+    Storage.close();
+}
+
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ( System Memory functions end) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ( Employee functions start) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -260,16 +310,52 @@ void AirportManagementSystem::pushEmployee(string n, string id, string d)
         newNode->setPrevNode(EmployeeCurrentNode);
     }
     employeeSize++;
-    cout << "Employee Successfully Registered" << endl;
 }
 
-// void AirportManagementSystem::popEmployee(string id)
-// {
-// }
+void AirportManagementSystem::popEmployee(string id)
+{
+    EmployeeCurrentNode = EmployeeHeadNode;
+    while (EmployeeCurrentNode != nullptr)
+    {
+        if (EmployeeCurrentNode->getID() == id)
+        {
+            // If the node to be deleted is the head node
+            if (EmployeeCurrentNode == EmployeeHeadNode)
+            {
+                EmployeeHeadNode = EmployeeCurrentNode->getNextNode();
+            }
 
-// void AirportManagementSystem::showEmployeeByID(string id)
-// {
-// }
+            if (EmployeeCurrentNode->getPrevNode() != nullptr)
+            {
+                EmployeeCurrentNode->getPrevNode()->setNextNode(EmployeeCurrentNode->getNextNode());
+            }
+
+            if (EmployeeCurrentNode->getNextNode() != nullptr)
+            {
+                EmployeeCurrentNode->getNextNode()->setPrevNode(EmployeeCurrentNode->getPrevNode());
+            }
+
+            delete EmployeeCurrentNode;
+            employeeSize--;
+            cout << "Employee successfully removed" << endl;
+            return;
+        }
+        EmployeeCurrentNode = EmployeeCurrentNode->getNextNode();
+    }
+}
+
+void AirportManagementSystem::showEmployeeByID(string id)
+{
+    EmployeeCurrentNode = EmployeeHeadNode;
+    while (EmployeeCurrentNode != nullptr)
+    {
+        if (EmployeeCurrentNode->getID() == id)
+        {
+            EmployeeCurrentNode->displayEmployee();
+        }
+        EmployeeCurrentNode = EmployeeCurrentNode->getNextNode();
+    }
+}
 
 void AirportManagementSystem::showALLEmployees()
 {
@@ -283,14 +369,12 @@ void AirportManagementSystem::showALLEmployees()
         EmployeeCurrentNode = EmployeeHeadNode;
         while (EmployeeCurrentNode != nullptr)
         {
-            cout << "Employee Name: " << EmployeeCurrentNode->getName() << endl;
-            cout << "Employee ID: " << EmployeeCurrentNode->getID() << endl;
-            cout << "Employee Designatione: " << EmployeeCurrentNode->getDesignation() << endl
-                 << endl;
+            EmployeeCurrentNode->displayEmployee();
             EmployeeCurrentNode = EmployeeCurrentNode->getNextNode();
         }
     }
 }
+
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ( Employee functions end) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 // +++++++++++++++++++++++++++++++++++++ ( Flight functions start) +++++++++++++++++++++++++++++++++++++
@@ -312,15 +396,38 @@ void AirportManagementSystem::pushFlight(string Origin, string Destination, stri
         newNode->setPrevNode(FlightCurrentNode);
     }
     flightSize++;
-    cout << "Flight Successfully Added" << endl;
 }
 
-// void AirportManagementSystem::popFlight(string flightCode)
-// {
-// }
-
-void AirportManagementSystem::showFlightByFlightCode(string flightCode)
+void AirportManagementSystem::popFlight(string flightCode)
 {
+    FlightCurrentNode = FlightHeadNode;
+    while (FlightCurrentNode != nullptr)
+    {
+        if (FlightCurrentNode->getFlighCode() == flightCode)
+        {
+            // If the node to be deleted is the head node
+            if (FlightCurrentNode == FlightHeadNode)
+            {
+                FlightHeadNode = FlightCurrentNode->getNextNode();
+            }
+
+            if (FlightCurrentNode->getPrevNode() != nullptr)
+            {
+                FlightCurrentNode->getPrevNode()->setNextNode(FlightCurrentNode->getNextNode());
+            }
+
+            if (FlightCurrentNode->getNextNode() != nullptr)
+            {
+                FlightCurrentNode->getNextNode()->setPrevNode(FlightCurrentNode->getPrevNode());
+            }
+
+            delete FlightCurrentNode;
+            flightSize--;
+            cout << "Flight successfully removed" << endl;
+            return;
+        }
+        FlightCurrentNode = FlightCurrentNode->getNextNode();
+    }
 }
 
 void AirportManagementSystem::showAllFlight()
@@ -335,53 +442,159 @@ void AirportManagementSystem::showAllFlight()
         FlightCurrentNode = FlightHeadNode;
         while (FlightCurrentNode != nullptr)
         {
-            cout << "Flight origin: " << FlightCurrentNode->getOrigin() << endl;
-            cout << "Flight destination: " << FlightCurrentNode->getDestination() << endl;
-            cout << "Flight departure: " << FlightCurrentNode->getDeparture() << endl;
-            cout << "Flight arrival: " << FlightCurrentNode->getArrival() << endl;
-            cout << "Flight flighCode: " << FlightCurrentNode->getFlighCode() << endl;
-            cout << "Flight price: " << FlightCurrentNode->getPrice() << endl;
-            cout << "Flight totalSeats: " << FlightCurrentNode->getTotalSeats() << endl
-                 << endl;
+            FlightCurrentNode->displayFlight();
             FlightCurrentNode = FlightCurrentNode->getNextNode();
         }
     }
 }
 
-// void AirportManagementSystem::showFlightByOrigin(string Origin)
-// {
-// }
+void AirportManagementSystem::showFlightByFlightCode(string flightCode)
+{
+    FlightCurrentNode = FlightHeadNode;
+    while (FlightCurrentNode != nullptr)
+    {
+        if (FlightCurrentNode->getFlighCode() == flightCode)
+        {
+            FlightCurrentNode->displayFlight();
+        }
+        FlightCurrentNode = FlightCurrentNode->getNextNode();
+    }
+}
 
-// void AirportManagementSystem::showFlightByDestination(string destinition)
-// {
-// }
+void AirportManagementSystem::showFlightByOrigin(string Origin)
+{
+    FlightCurrentNode = FlightHeadNode;
+    while (FlightCurrentNode != nullptr)
+    {
+        if (FlightCurrentNode->getOrigin() == Origin)
+        {
+            FlightCurrentNode->displayFlight();
+        }
+        FlightCurrentNode = FlightCurrentNode->getNextNode();
+    }
+}
 
-// void AirportManagementSystem::printUniqueOrigins()
-// {
-// }
+void AirportManagementSystem::showFlightByDestination(string destinition)
+{
+    FlightCurrentNode = FlightHeadNode;
+    while (FlightCurrentNode != nullptr)
+    {
+        if (FlightCurrentNode->getDestination() == destinition)
+        {
+            FlightCurrentNode->displayFlight();
+        }
+        FlightCurrentNode = FlightCurrentNode->getNextNode();
+    }
+}
 
-// bool AirportManagementSystem::checkOriginAvailiblity(string o)
-// {
-// }
+void AirportManagementSystem::printUniqueOrigins()
+{
+    FlightCurrentNode = FlightHeadNode;
+    while (FlightCurrentNode != nullptr)
+    {
+        bool isUnique = true;
+        FlightNode *temp = FlightHeadNode;
+        while (temp != FlightCurrentNode)
+        {
+            if (temp->getOrigin() == FlightCurrentNode->getOrigin())
+            {
+                isUnique = false;
+                break;
+            }
+            temp = temp->getNextNode();
+        }
+        if (isUnique)
+        {
+            cout << FlightCurrentNode->getOrigin() << endl;
+        }
+        FlightCurrentNode = FlightCurrentNode->getNextNode();
+    }
+    cout << endl;
+}
+
+bool AirportManagementSystem::checkOriginAvailiblity(string o)
+{
+    FlightCurrentNode = FlightHeadNode;
+    while (FlightCurrentNode != nullptr)
+    {
+        if (FlightCurrentNode->getOrigin() == o)
+        {
+            return true;
+        }
+        FlightCurrentNode = FlightCurrentNode->getNextNode();
+    }
+    return false;
+}
+
+void AirportManagementSystem::printUniqueDestinations()
+{
+    FlightCurrentNode = FlightHeadNode;
+    while (FlightCurrentNode != nullptr)
+    {
+        bool isUnique = true;
+        FlightNode *temp = FlightHeadNode;
+        while (temp != FlightCurrentNode)
+        {
+            if (temp->getDestination() == FlightCurrentNode->getDestination())
+            {
+                isUnique = false;
+                break;
+            }
+            temp = temp->getNextNode();
+        }
+        if (isUnique)
+        {
+            cout << FlightCurrentNode->getDestination() << endl;
+        }
+        FlightCurrentNode = FlightCurrentNode->getNextNode();
+    }
+    cout << endl;
+}
+
+bool AirportManagementSystem::checkDestinationAvailiblity(string d)
+{
+    FlightCurrentNode = FlightHeadNode;
+    while (FlightCurrentNode != nullptr)
+    {
+        if (FlightCurrentNode->getDestination() == d)
+        {
+            return true;
+        }
+        FlightCurrentNode = FlightCurrentNode->getNextNode();
+    }
+    return false;
+}
+
+void AirportManagementSystem::getFlight(string o, string d)
+{
+    FlightCurrentNode = FlightHeadNode;
+    while (FlightCurrentNode != nullptr)
+    {
+        if (FlightCurrentNode->getOrigin() == o && FlightCurrentNode->getDestination() == d)
+        {
+            FlightCurrentNode->displayFlight();
+        }
+        FlightCurrentNode = FlightCurrentNode->getNextNode();
+    }
+}
+
+bool AirportManagementSystem::checkFlightCode(string o, string d, string fC)
+{
+    FlightCurrentNode = FlightHeadNode;
+    while (FlightCurrentNode != nullptr)
+    {
+        if (FlightCurrentNode->getOrigin() == o && FlightCurrentNode->getDestination() == d && FlightCurrentNode->getFlighCode() == fC)
+        {
+            return true;
+        }
+        FlightCurrentNode = FlightCurrentNode->getNextNode();
+    }
+    return false;
+}
+
 // +++++++++++++++++++++++++++++++++++++ ( Flight functions end) +++++++++++++++++++++++++++++++++++++
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ( Passenger functions start) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-// void AirportManagementSystem::printUniqueDestinations()
-// {
-// }
-
-// bool AirportManagementSystem::checkDestinationAvailiblity(string d)
-// {
-// }
-
-// void AirportManagementSystem::getFlight(string o, string d)
-// {
-// }
-
-// bool AirportManagementSystem::checkFlightCode(string o, string d, string fC)
-// {
-// }
 
 void AirportManagementSystem::bookFlight_pushPassenger(string name, string id, string flightCode, string contact)
 {
@@ -401,12 +614,39 @@ void AirportManagementSystem::bookFlight_pushPassenger(string name, string id, s
         newNode->setPrevNode(PassengerCurrentNode);
     }
     passengerSize++;
-    cout << "Flight Successfully Added" << endl;
 }
 
-// void AirportManagementSystem::cancelBooking_popPassenger(string id)
-// {
-// }
+void AirportManagementSystem::cancelBooking_popPassenger(string id)
+{
+    PassengerCurrentNode = PassengerHeadNode;
+    while (PassengerCurrentNode != nullptr)
+    {
+        if (PassengerCurrentNode->getID() == id)
+        {
+            if (PassengerCurrentNode == PassengerHeadNode)
+            {
+                PassengerHeadNode = PassengerCurrentNode->getNextNode();
+            }
+
+            if (PassengerCurrentNode->getPrevNode() != nullptr)
+            {
+                PassengerCurrentNode->getPrevNode()->setNextNode(PassengerCurrentNode->getNextNode());
+            }
+
+            if (PassengerCurrentNode->getNextNode() != nullptr)
+            {
+                PassengerCurrentNode->getNextNode()->setPrevNode(PassengerCurrentNode->getPrevNode());
+            }
+
+            delete PassengerCurrentNode;
+            passengerSize--;
+            cout << "Passenger successfully removed" << endl;
+        }
+
+        PassengerCurrentNode = PassengerCurrentNode->getNextNode();
+    }
+}
+
 void AirportManagementSystem::showAllPassengers()
 {
     cout << "Total Passengers: " << passengerSize << endl;
@@ -419,38 +659,62 @@ void AirportManagementSystem::showAllPassengers()
         PassengerCurrentNode = PassengerHeadNode;
         while (PassengerCurrentNode != nullptr)
         {
-            cout << "Passenger Name: " << PassengerCurrentNode->getname() << endl;
-            cout << "Passenger ID: " << PassengerCurrentNode->getID() << endl;
-            cout << "Passenger Flight Code: " << PassengerCurrentNode->getflightCode() << endl;
-            cout << "Passenger Contact Number: " << PassengerCurrentNode->getcontactNumber() << endl
-                 << endl;
+            PassengerCurrentNode->displayPassenger();
             PassengerCurrentNode = PassengerCurrentNode->getNextNode();
         }
     }
 }
 
-// void AirportManagementSystem::showPassengerByID(string id)
-// {
-// }
+void AirportManagementSystem::showPassengerByID(string id)
+{
+    PassengerCurrentNode = PassengerHeadNode;
+    while (PassengerCurrentNode != nullptr)
+    {
+        if (PassengerCurrentNode->getID() == id)
+        {
+            PassengerCurrentNode->displayPassenger();
+        }
 
-// void AirportManagementSystem::showAllPassengerOfFlight(string flightCode)
-// {
-// }
+        PassengerCurrentNode = PassengerCurrentNode->getNextNode();
+    }
+}
+
+void AirportManagementSystem::showAllPassengerOfFlight(string flightCode)
+{
+    PassengerCurrentNode = PassengerHeadNode;
+    while (PassengerCurrentNode != nullptr)
+    {
+        if (PassengerCurrentNode->getflightCode() == flightCode)
+        {
+            PassengerCurrentNode->displayPassenger();
+        }
+
+        PassengerCurrentNode = PassengerCurrentNode->getNextNode();
+    }
+}
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ( Passenger functions end) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 int main()
 {
+    system("cls");
     AirportManagementSystem System;
     System.ImportData();
+    // System.popEmployee("0001");
+    // System.popEmployee("0003");
+    // System.popFlight("DRP001");
 
-    cout << "\n%%%%%%%%%%%%%%%%%%% (Printing Passengers) %%%%%%%%%%%%%%%%%%%\n"
-         << endl;
-    System.showAllPassengers();
-    cout << "\n%%%%%%%%%%%%%%%%%%% (Printing Employees) %%%%%%%%%%%%%%%%%%%\n"
-         << endl;
-    System.showALLEmployees();
-    cout << "\n%%%%%%%%%%%%%%%%%%% (Printing Flight) %%%%%%%%%%%%%%%%%%%\n"
-         << endl;
-    System.showAllFlight();
+    // cout << "\n%%%%%%%%%%% (Printing Passengers) %%%%%%%%%%%\n"
+    //      << endl;
+    // System.showAllPassengers();
+    // cout << "\n%%%%%%%%%%% (Printing Employees) %%%%%%%%%%%\n"
+    //      << endl;
+    // System.showALLEmployees();
+    // cout << "\n%%%%%%%%%%% (Printing Flight) %%%%%%%%%%%\n"
+    //      << endl;
+    // System.showAllFlight();
+    // System.getFlight("Lahore", "Washington");
+    // System.showFlightByOrigin("Lahore");
+    // System.showFlightByDestination("Washington");
+    // cout << System.checkFlightCode("Lahore", "Washington", "DRP001");
     return 0;
 }
