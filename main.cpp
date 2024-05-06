@@ -1,4 +1,6 @@
 #include <iostream>
+#include <conio.h> // to use _getch in getPassword
+#include <string>  // to use push and pop in getPassword
 #include <fstream>
 using namespace std;
 
@@ -694,27 +696,403 @@ void AirportManagementSystem::showAllPassengerOfFlight(string flightCode)
 }
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ( Passenger functions end) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+inline void greetings();
+void authentication();
+string getPassword(const string &x);
+void manageEmployees(AirportManagementSystem *ptrSys);
+void manageFlights(AirportManagementSystem *ptrSys);
+void ticketCounter(AirportManagementSystem *ptrSys);
+
 int main()
 {
-    system("cls");
+    greetings();
+    authentication();
+    cout << endl;
+
     AirportManagementSystem System;
     System.ImportData();
-    // System.popEmployee("0001");
-    // System.popEmployee("0003");
-    // System.popFlight("DRP001");
 
-    // cout << "\n%%%%%%%%%%% (Printing Passengers) %%%%%%%%%%%\n"
-    //      << endl;
-    // System.showAllPassengers();
-    // cout << "\n%%%%%%%%%%% (Printing Employees) %%%%%%%%%%%\n"
-    //      << endl;
-    // System.showALLEmployees();
-    // cout << "\n%%%%%%%%%%% (Printing Flight) %%%%%%%%%%%\n"
-    //      << endl;
-    // System.showAllFlight();
-    // System.getFlight("Lahore", "Washington");
-    // System.showFlightByOrigin("Lahore");
-    // System.showFlightByDestination("Washington");
-    // cout << System.checkFlightCode("Lahore", "Washington", "DRP001");
+    int choice;
+    do
+    {
+        cin.clear();
+        fflush(stdin);
+
+        cout << "________________________________\n";
+        cout << "|---------( Main Page )--------|\n";
+        cout << "| Choose one of the following: |\n";
+        cout << "********************************\n";
+        cout << "| 1: Manage Employees          |\n";
+        cout << "| 2: Manage Flights            |\n";
+        cout << "| 3: Ticket Counter            |\n";
+        cout << "| 4: Exit                      |\n";
+        cout << "********************************\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice)
+        {
+        case 1:
+            system("cls"); // to clear console
+            manageEmployees(&System);
+            break;
+        case 2:
+            system("cls");
+            manageFlights(&System);
+            break;
+        case 3:
+            system("cls");
+            ticketCounter(&System);
+            break;
+        case 4:
+            system("cls");
+            cout << "\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n";
+            cout << "%%% (Thanks for using our AMS) %%%\n";
+            cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n";
+            break;
+
+        default:
+            system("cls");
+            cout << "Invalid Input\n";
+            break;
+        }
+
+    } while (choice != 4);
+
     return 0;
+}
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% (Main ended) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+inline void greetings()
+{
+    cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n";
+    cout << "%%%% Welcome to Superior Airport Management System %%%%\n";
+    cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n";
+    cout << endl
+         << endl;
+    cout << "Press enter to continue...";
+    cin.ignore();
+    system("cls");
+}
+
+void authentication()
+{
+    int tries = 0;
+    do
+    {
+        string password = getPassword("Enter the password: ");
+        if (password == "hello")
+        {
+            return; // if password correct, return from function
+        }
+        system("cls");
+        if (tries != 2)
+        {
+            cout << "Wrong Password! Try again\n";
+        }
+        else
+        {
+            cout << "You got password wrong 3 times\n";
+            exit(0);
+        }
+        tries++;
+
+    } while (tries < 3);
+}
+
+string getPassword(const string &x)
+{
+    cout << x;
+    char temp = 0;   // ascii 0 = NULL // each character will first come to temp, then concatinate with y
+    string password; // this is the password that we will return
+
+    // using (get character) _getch instead of getch : https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/getch?view=msvc-170
+    while ((temp = _getch()) != 13) // ascii 13 = Enter
+    {
+        if (temp == 8 && !password.empty()) // ascii 8 means backspace
+        {
+            cout << "\b \b";     // move cursor back, then print space, then move back again
+            password.pop_back(); // remove last character from string
+        }
+        else
+        {
+            cout << '*';
+            password.push_back(temp);
+        }
+    }
+    return password;
+}
+
+void manageEmployees(AirportManagementSystem *ptrSys)
+{
+    int choice;
+    do
+    {
+        cin.clear();
+        fflush(stdin);
+
+        cout << "________________________________\n";
+        cout << "|---------( Employees )--------|\n";
+        cout << "| Choose one of the following: |\n";
+        cout << "********************************\n";
+        cout << "| 1: Show all Employees        |\n";
+        cout << "| 2: Show Employee by ID       |\n";
+        cout << "| 3: Add Employee              |\n";
+        cout << "| 4: Remove Employee           |\n";
+        cout << "| 5: Exit                      |\n";
+        cout << "********************************\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        string name;
+        string ID; // because this cannot be declared within the switch
+        string designation;
+        switch (choice)
+        {
+        case 1:
+            system("cls"); // to clear console
+            // ptrSys->showEmployees();
+            ptrSys->showALLEmployees();
+            break;
+        case 2:
+            system("cls");
+            cout << "Enter the Employee ID: ";
+            cin >> ID;
+            ptrSys->showEmployeeByID(ID);
+            break;
+        case 3:
+            system("cls");
+            cout << "Enter the name of Employee: ";
+            getline(cin >> ws, name);
+            cout << "Enter the ID of Employee: ";
+            cin >> ID;
+            cout << "Enter the designation of Employee: ";
+            cin >> designation;
+            ptrSys->pushEmployee(name, ID, designation);
+            break;
+        case 4:
+            system("cls");
+            cout << "Enter the Employee ID: ";
+            cin >> ID;
+            ptrSys->popEmployee(ID);
+            break;
+        case 5:
+            system("cls");
+            break;
+
+        default:
+            system("cls");
+            cout << "Invalid Input\n";
+            break;
+        }
+
+    } while (choice != 5);
+}
+
+void manageFlights(AirportManagementSystem *ptrSys)
+{
+    int choice;
+    do
+    {
+        cin.clear();
+        fflush(stdin);
+
+        cout << "_________________________________\n";
+        cout << "|-----------( Flights )---------|\n";
+        cout << "| Choose one of the following:  |\n";
+        cout << "*********************************\n";
+        cout << "| 1: Show all Flights           |\n";
+        cout << "| 2: Show Flight by Origin      |\n";
+        cout << "| 3: Show Flight by Destination |\n";
+        cout << "| 4: Show Flight by Flight Code |\n";
+        cout << "| 5: Add Flight                 |\n";
+        cout << "| 6: Remove Flight              |\n";
+        cout << "| 7: Exit                       |\n";
+        cout << "*********************************\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        // because this cannot be declared within the switch
+        string origin;
+        string destination;
+        string departure;
+        string arrival;
+        string flighCode;
+        string price;
+        string totalSeats;
+
+        switch (choice)
+        {
+        case 1:
+            system("cls"); // to clear console
+            ptrSys->showAllFlight();
+            break;
+        case 2:
+            system("cls"); // to clear console
+            cout << "Enter origin: ";
+            cin >> origin;
+            ptrSys->showFlightByOrigin(origin);
+            break;
+        case 3:
+            system("cls"); // to clear console
+            cout << "Enter Destination: ";
+            cin >> destination;
+            ptrSys->showFlightByDestination(destination);
+            break;
+        case 4:
+            system("cls");
+            cout << "Enter Flight Code: ";
+            cin >> flighCode;
+            ptrSys->showFlightByFlightCode(flighCode);
+            break;
+        case 5:
+            system("cls");
+            cout << "Enter flightCode: ";
+            getline(cin >> ws, flighCode);
+            cout << "Enter Origin: ";
+            getline(cin >> ws, origin);
+            cout << "Enter Destination: ";
+            getline(cin >> ws, destination);
+            cout << "Enter Departure Time: ";
+            getline(cin >> ws, departure);
+            cout << "Enter Arrival Time: ";
+            getline(cin >> ws, arrival);
+            cout << "Enter Total no. of seats: ";
+            cin >> totalSeats;
+            cout << "Enter price per seat: ";
+            cin >> price;
+            ptrSys->pushFlight(origin, destination, departure, arrival, flighCode, totalSeats, price);
+            break;
+        case 6:
+            system("cls");
+            cout << "Enter the Flight Code: ";
+            cin >> flighCode;
+            ptrSys->popFlight(flighCode);
+            break;
+        case 7:
+            system("cls");
+            break;
+
+        default:
+            system("cls");
+            cout << "Invalid Input\n";
+            break;
+        }
+
+    } while (choice != 7);
+}
+
+void ticketCounter(AirportManagementSystem *ptrSys)
+{
+    int choice;
+    do
+    {
+        cin.clear();
+        fflush(stdin);
+
+        cout << "_________________________________\n";
+        cout << "|-------( Ticket Counter )------|\n";
+        cout << "| Choose one of the following:  |\n";
+        cout << "*********************************\n";
+        cout << "| 1: Book a flight              |\n";
+        cout << "| 2: Cancel booking             |\n";
+        cout << "| 3: Show all Passengers        |\n";
+        cout << "| 4: Show Passenger by ID       |\n";
+        cout << "| 5: All Passengers of a flight |\n";
+        cout << "| 6: Exit                       |\n";
+        cout << "*********************************\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        // because this cannot be declared within the switch
+        string name;
+        string ID;
+        string flightCode;
+        string contactNumber;
+        string seatNumber;
+        string origin;
+        string destination;
+
+        switch (choice)
+        {
+        case 1:
+            system("cls"); // to clear console
+
+            ptrSys->printUniqueOrigins();
+            cout << "Enter your origin: ";
+            getline(cin >> ws, origin);
+            if (!ptrSys->checkOriginAvailiblity(origin))
+            {
+                system("cls");
+                cout << "Origin not availible\n";
+                break;
+            }
+
+            system("cls");
+            ptrSys->printUniqueDestinations();
+            cout << "Enter your destination: ";
+            getline(cin >> ws, destination);
+            if (!ptrSys->checkDestinationAvailiblity(destination))
+            {
+                system("cls");
+                cout << "Destination not availible\n";
+                break;
+            }
+
+            system("cls");
+            ptrSys->getFlight(origin, destination);
+            cout << "Enter flight Code to confirm your seat: ";
+            getline(cin >> ws, flightCode);
+            if (!ptrSys->checkFlightCode(origin, destination, flightCode))
+            {
+                cout << "Invalid Flight Code\n";
+                break;
+            }
+
+            system("cls");
+            cout << "Enter Name of Passenger: ";
+            getline(cin >> ws, name);
+            cout << "Enter ID of Passenger: ";
+            getline(cin >> ws, ID);
+            cout << "Enter Contact Number of Passenger: ";
+            getline(cin >> ws, contactNumber);
+            ptrSys->bookFlight_pushPassenger(name, ID, flightCode, contactNumber);
+            break;
+
+        case 2:
+            system("cls"); // to clear console
+            cout << "Enter ID: ";
+            getline(cin >> ws, ID);
+            ptrSys->cancelBooking_popPassenger(ID);
+            break;
+
+        case 3:
+            system("cls"); // to clear console
+            ptrSys->showAllPassengers();
+            break;
+
+        case 4:
+            system("cls");
+            cout << "Enter Passenger ID: ";
+            getline(cin >> ws, ID);
+            ptrSys->showPassengerByID(ID);
+            break;
+        case 5:
+            system("cls");
+            cout << "Enter Flight Code: ";
+            getline(cin >> ws, flightCode);
+            ptrSys->showAllPassengerOfFlight(flightCode);
+            break;
+        case 6:
+            system("cls");
+            break;
+
+        default:
+            system("cls");
+            cout << "Invalid Input\n";
+            break;
+        }
+
+    } while (choice != 6);
 }
