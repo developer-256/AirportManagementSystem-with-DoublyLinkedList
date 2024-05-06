@@ -1,3 +1,4 @@
+// Password: hello
 #include <iostream>
 #include <conio.h> // to use _getch in getPassword
 #include <string>  // to use push and pop in getPassword
@@ -244,11 +245,11 @@ void AirportManagementSystem::ArrayToDoubly(string *array)
     {
         pushEmployee(array[1], array[2], array[3]);
     }
-    else if (array[0] == "passenger")
+    if (array[0] == "passenger")
     {
         bookFlight_pushPassenger(array[1], array[2], array[3], array[4]);
     }
-    else if (array[0] == "flight")
+    if (array[0] == "flight")
     {
         pushFlight(array[1], array[2], array[3], array[4], array[5], array[6], array[7]);
     }
@@ -264,7 +265,7 @@ void AirportManagementSystem::exportEntireData()
         EmployeeCurrentNode = EmployeeHeadNode;
         while (EmployeeCurrentNode != nullptr)
         {
-            Storage << "employee," << EmployeeCurrentNode->getName() << "," << EmployeeCurrentNode->getID() << "," << EmployeeCurrentNode->getDesignation() << endl;
+            Storage << "employee," << EmployeeCurrentNode->getName() << "," << EmployeeCurrentNode->getID() << "," << EmployeeCurrentNode->getDesignation() << ",\"\",\"\",\"\"," << endl;
             EmployeeCurrentNode = EmployeeCurrentNode->getNextNode();
         }
     }
@@ -274,7 +275,7 @@ void AirportManagementSystem::exportEntireData()
         PassengerCurrentNode = PassengerHeadNode;
         while (PassengerCurrentNode != nullptr)
         {
-            Storage << "passenger," << PassengerCurrentNode->getname() << "," << PassengerCurrentNode->getID() << "," << PassengerCurrentNode->getflightCode() << "," << PassengerCurrentNode->getcontactNumber() << endl;
+            Storage << "passenger," << PassengerCurrentNode->getname() << "," << PassengerCurrentNode->getID() << "," << PassengerCurrentNode->getflightCode() << "," << PassengerCurrentNode->getcontactNumber() << ",\"\",\"\",\"\",\"\"," << endl;
             PassengerCurrentNode = PassengerCurrentNode->getNextNode();
         }
     }
@@ -284,7 +285,7 @@ void AirportManagementSystem::exportEntireData()
         FlightCurrentNode = FlightHeadNode;
         while (FlightCurrentNode != nullptr)
         {
-            Storage << "flight," << FlightCurrentNode->getOrigin() << "," << FlightCurrentNode->getDestination() << "," << FlightCurrentNode->getDeparture() << "," << FlightCurrentNode->getArrival() << "," << FlightCurrentNode->getFlighCode() << "," << FlightCurrentNode->getTotalSeats() << "," << FlightCurrentNode->getPrice() << endl;
+            Storage << "flight," << FlightCurrentNode->getOrigin() << "," << FlightCurrentNode->getDestination() << "," << FlightCurrentNode->getDeparture() << "," << FlightCurrentNode->getArrival() << "," << FlightCurrentNode->getFlighCode() << "," << FlightCurrentNode->getTotalSeats() << "," << FlightCurrentNode->getPrice() << "," << endl;
             FlightCurrentNode = FlightCurrentNode->getNextNode();
         }
     }
@@ -868,14 +869,16 @@ void manageEmployees(AirportManagementSystem *ptrSys)
             cout << "Enter the ID of Employee: ";
             cin >> ID;
             cout << "Enter the designation of Employee: ";
-            cin >> designation;
+            getline(cin >> ws, designation);
             ptrSys->pushEmployee(name, ID, designation);
+            ptrSys->exportEntireData();
             break;
         case 4:
             system("cls");
             cout << "Enter the Employee ID: ";
             cin >> ID;
             ptrSys->popEmployee(ID);
+            ptrSys->exportEntireData();
             break;
         case 5:
             system("cls");
@@ -963,12 +966,14 @@ void manageFlights(AirportManagementSystem *ptrSys)
             cout << "Enter price per seat: ";
             cin >> price;
             ptrSys->pushFlight(origin, destination, departure, arrival, flighCode, totalSeats, price);
+            ptrSys->exportEntireData();
             break;
         case 6:
             system("cls");
             cout << "Enter the Flight Code: ";
             cin >> flighCode;
             ptrSys->popFlight(flighCode);
+            ptrSys->exportEntireData();
             break;
         case 7:
             system("cls");
@@ -1058,6 +1063,7 @@ void ticketCounter(AirportManagementSystem *ptrSys)
             cout << "Enter Contact Number of Passenger: ";
             getline(cin >> ws, contactNumber);
             ptrSys->bookFlight_pushPassenger(name, ID, flightCode, contactNumber);
+            ptrSys->exportEntireData();
             break;
 
         case 2:
@@ -1065,6 +1071,7 @@ void ticketCounter(AirportManagementSystem *ptrSys)
             cout << "Enter ID: ";
             getline(cin >> ws, ID);
             ptrSys->cancelBooking_popPassenger(ID);
+            ptrSys->exportEntireData();
             break;
 
         case 3:
